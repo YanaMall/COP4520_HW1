@@ -14,30 +14,29 @@ public class Prime
 	{
 		//The clock start and the program immediately jumps into the algorithm for finding primes
 		long startTime = System.currentTimeMillis();
-        findPrime();
-        long endTime = System.currentTimeMillis();
-        long timeTook = (endTime - startTime);
-        //Once the prime algorthim is successfully execurted and finished, the clock stops
-        //Creating the output file doesnt work unless enclosed in a try-catch block
-        try
-        {
-         	File myFile = new File("primeFile.txt");
-         	myFile.createNewFile();
-         	FileWriter myWriter = new FileWriter("primeFile.txt");
+        	findPrime();
+       		long endTime = System.currentTimeMillis();
+        	long timeTook = (endTime - startTime);
+        	//Once the prime algorthim is successfully execurted and finished, the clock stops
+        	//Creating the output file doesnt work unless enclosed in a try-catch block
+        	try
+        	{
+         		File myFile = new File("primeFile.txt");
+         		myFile.createNewFile();
+         		FileWriter myWriter = new FileWriter("primeFile.txt");
 
-         	myWriter.write(timeTook + " milliseconds, Sum of primes: " + ClassForPrime.primeSum+ ", Count of primes: " + ClassForPrime.primeCount + "\n");
-         	myWriter.close();
-     	}
-     	catch (IOException io)
-     	{
-     		System.out.println("[IOException]: ");
-            io.printStackTrace();
-     	}
+         		myWriter.write(timeTook + " milliseconds, Sum of primes: " + ClassForPrime.primeSum+ ", Count of primes: " + ClassForPrime.primeCount + "\n");
+         		myWriter.close();
+     		}
+     		catch (IOException io)
+     		{
+     			System.out.println("[IOException]: ");
+            		io.printStackTrace();
+     		}
 	}
 
 	public static void findPrime()
 	{
-		Thread threadArray[] = new Thread[numThreads];
 		//The thread length are as evenly divided as they can be by taking
 		// the max number (10^8) divided by 8 threads
 		int threadLength = maxValue / numThreads;
@@ -49,18 +48,17 @@ public class Prime
 		{
 			Thread newThread = new Thread(new ClassForPrime(start, end));
 			newThread.start();
-			//threadArray[i] = newThread;
 		}
 	}
 }
 //As i understand it, when using threads, the class has to be runnable?
 class ClassForPrime implements Runnable
 {
-	//The helper class will determine whether a number is prime
-	//and also keep track of the prime count and sum
-	public static int primeSum = 0;
-	public static long primeCount = 0;
-	private final long start;
+    //The helper class will determine whether a number is prime
+    //and also keep track of the prime count and sum
+    public static int primeSum = 0;
+    public static long primeCount = 0;
+    private final long start;
     private final long end;
 
     public ClassForPrime(long start, long end)
@@ -68,8 +66,8 @@ class ClassForPrime implements Runnable
     	this.start = start;
     	this.end = end;
     }
-
-    private synchronized void increment(long number)
+    //Made primePlus synchromized like the example in class to make it an atomic operation
+    private synchronized void primePlus(long number)
     {
     	primeSum += number;
     }
@@ -85,20 +83,20 @@ class ClassForPrime implements Runnable
         return true;
     }
     //algorithm for counting the number of primes as well as the sum
-    private void numPrimes() 
+    private void numOfPrimes() 
     {
         primeCount = 0;
         for (long i = start; i <= end; i++) {
             if (isPrime(i))
                 primeCount++;
         }
-        increment(primeCount);
+        primePlus(primeCount);
     }
     
     public void run() 
     {
     	//running the alogrithm above then telling the program to stop using the current thread
-        numPrimes();
+        numOfPrimes();
         Thread.yield();
     }
 }
